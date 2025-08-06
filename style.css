@@ -8,8 +8,17 @@ body {
   background: #EEE;
 }
 
+@media (max-width: 768px) {
+  body {
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+}
+
 #app-container {
   text-align: center;
+  /* border: 1px dotted black; /* Debug: app container boundaries */
+  width: 100%;
 }
 
 /* Header Layout */
@@ -70,25 +79,11 @@ body {
   /* background: yellow; */ /* Debug: highlight action buttons container */
 }
 
-/* Mode Containers */
-.mode-container {
-  display: none;
-}
-
-.mode-container.active {
-  display: block;
-}
-
 /* Ensure consistent height across modes */
 #app-container {
   min-height: 600px; /* Account for header + flip display + timer inputs + spacing */
   display: flex;
   flex-direction: column;
-}
-
-/* Force consistent height for mode containers */
-.mode-container {
-  min-height: 300px; /* Space for flip display + timer inputs */
 }
 
 /* Hide timer inputs by default and on stopwatch mode */
@@ -149,12 +144,105 @@ body {
   background: #333333;
 }
 
+/* Responsive Design */
+@media (max-width: 768px) {
+  /* Header adjustments for tablets and mobile */
+  #header {
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+  }
+  
+  #action-buttons {
+    position: static;
+    transform: none;
+    justify-content: center;
+  }
+  
+  /* Larger buttons for touch */
+  #action-buttons button {
+    padding: 14px 28px;
+    font-size: 18px;
+  }
+  
+  .tab-btn {
+    padding: 14px 28px;
+    font-size: 18px;
+  }
+  
+  /* Input adjustments */
+  .input-group input {
+    width: 100px;
+    padding: 12px;
+    font-size: 18px;
+  }
+  
+  /* Reduce container heights */
+  .mode-container {
+    min-height: 250px;
+  }
+  
+  #stopwatch-display,
+  #timer-display {
+    min-height: 150px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Small mobile adjustments */
+  body {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  
+  #timer-input {
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  #action-buttons {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  #action-buttons button {
+    min-width: 120px;
+  }
+  
+  /* Stack tab buttons */
+  #tab-navigation {
+    display: flex;
+    gap: 10px;
+  }
+  
+  /* Reduce flip card size slightly on very small screens */
+  .card {
+    font-size: 8vw;
+  }
+  
+  .flip-clock__slot {
+    font-size: 3vw;
+  }
+  
+  .reset-icon-btn {
+    min-width: 44px;
+    min-height: 44px; /* Larger touch target on mobile */
+  }
+  
+  .reset-icon-btn svg {
+    width: 18px;
+    height: 18px; /* Slightly smaller on mobile */
+  }
+}
+
 /* Timer Input Styling */
 #timer-input {
   display: flex;
   gap: 6px;
   justify-content: center;
   margin-top: 30px;
+  order: 2; /* Place inputs below flip clock */
 }
 
 .input-group {
@@ -203,6 +291,37 @@ body {
 
 .input-group input[type="number"] {
   -moz-appearance: textfield;
+}
+
+/* Timer Reset Icon Button */
+.reset-icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  transition: all 0.2s ease;
+  min-width: 40px;
+  min-height: 40px; /* Minimum touch target for mobile */
+}
+
+.reset-icon-btn:hover {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.reset-icon-btn:active {
+  background-color: #e0e0e0;
+  transform: scale(0.95);
+}
+
+.reset-icon-btn svg {
+  width: 20px;
+  height: 20px;
 }
 
 /* Action Button Styling */
@@ -263,25 +382,40 @@ body {
   text-align: center;
   perspective: 400px;
   margin: 20px auto;
+  display: flex;
+  justify-content: center;
   
   *,
   *:before,
   *:after { box-sizing: border-box; }
 }
 
-/* Ensure flip displays are properly contained */
-#stopwatch-display,
-#timer-display {
-  display: flex;
+/* Mode containers now contain flip displays directly */
+.mode-container {
+  display: none;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  min-height: 200px; /* Consistent height for flip displays */
-  /* background: cyan; */ /* Debug: highlight flip display containers */
+  min-height: 300px;
+  /* border: 3px dotted green !important; /* Debug: container boundaries */
+}
+
+.mode-container.active {
+  display: flex;
+}
+
+.mode-container .flip-clock {
+  margin: 20px auto;
+  width: 100%;
 }
 
 .flip-clock__piece {
   display: inline-block;
   margin: 0 5px;
+  /* border: 1px solid orange !important; /* Debug: piece boundaries */
+  flex: 1; /* Each piece takes equal space */
+  text-align: center; /* Center card horizontally within piece */
+  /* max-width: 150px; /* Prevent cards from getting too large */
 }
 
 .flip-clock__slot {
@@ -292,10 +426,13 @@ body {
   display: block;
   position: relative; 
   padding-bottom: 0.72em;
-  font-size: 9vw;
+  font-size: 12vw;
   line-height: 0.95;
   font-family: 'Helvetica', sans-serif;
   font-weight: bold;
+  /* border: 2px solid red !important; /* Debug: card boundaries */
+  text-align: center; /* Center content within card */
+  width: 100%; /* Fill the orange piece width */
 }
 
 .card__top,
@@ -310,8 +447,9 @@ body {
   border-radius: 0.15em 0.15em 0 0;
   backface-visibility: hidden;
   transform-style: preserve-3d;
-  width: 1.8em;
+  width: 100%; /* Fill card width */
   transform: translateZ(0);
+  margin: 0 auto; /* Center card elements within card */
 }
 
 .card__bottom { 
@@ -324,6 +462,7 @@ body {
   border-radius: 0 0 0.15em 0.15em; 
   pointer-events: none;
   overflow: hidden;
+  width: 100%; /* Fill card width like other elements */
 }
 
 .card__bottom::after {
@@ -340,7 +479,8 @@ body {
   position: absolute;
   top: 0;
   height: 100%;
-  left: 0%;
+  left: 0;
+  width: 100%; /* Fill full width */
   pointer-events: none;
 }
 
@@ -348,6 +488,7 @@ body {
   position: relative;
   z-index: -1;
   overflow: hidden;
+  width: 100%; /* Ensure back element fills width */
 }
 
 .flip .card__back::before {

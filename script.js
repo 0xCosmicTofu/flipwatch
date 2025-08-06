@@ -177,8 +177,8 @@ function Timer() {
 var stopwatch = new Stopwatch();
 var timer = new Timer();
 
-document.getElementById('stopwatch-display').appendChild(stopwatch.el);
-document.getElementById('timer-display').appendChild(timer.el);
+document.getElementById('stopwatch-container').appendChild(stopwatch.el);
+document.getElementById('timer-container').appendChild(timer.el);
 
 // Ensure timer inputs are hidden on page load (handled by CSS)
 
@@ -288,6 +288,23 @@ function updateTimerDisplay() {
 }
 
 setupInputValidation();
+
+// Timer reset button functionality
+var timerResetBtn = document.getElementById('timer-reset-btn');
+timerResetBtn.addEventListener('click', function() {
+  // Clear all timer input fields
+  hoursInput.value = '';
+  minutesInput.value = '';
+  secondsInput.value = '';
+  
+  // Reset placeholders
+  hoursInput.placeholder = '0';
+  minutesInput.placeholder = '0';
+  secondsInput.placeholder = '0';
+  
+  // Update display to show 00:00:00
+  updateTimerDisplay();
+});
 
 // Unified action button handlers
 startBtn.addEventListener('click', function() {
