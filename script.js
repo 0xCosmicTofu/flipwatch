@@ -143,7 +143,7 @@ function Timer() {
         if (this.remainingTime <= 0) {
           this.remainingTime = 0;
           this.stop();
-          alert('Timer complete!');
+          showModal('Timer complete!');
         }
         this.updateDisplay();
       }, 100);
@@ -180,6 +180,36 @@ var timer = new Timer();
 document.getElementById('stopwatch-display').appendChild(stopwatch.el);
 document.getElementById('timer-display').appendChild(timer.el);
 
+// Ensure timer inputs are hidden on page load (handled by CSS)
+
+// Custom Modal Function
+function showModal(message) {
+  // Create modal overlay
+  var overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  
+  // Create modal content
+  var modal = document.createElement('div');
+  modal.className = 'modal';
+  
+  // Add message
+  var heading = document.createElement('h3');
+  heading.textContent = message;
+  modal.appendChild(heading);
+  
+  // Add OK button
+  var button = document.createElement('button');
+  button.textContent = 'OK';
+  button.onclick = function() {
+    document.body.removeChild(overlay);
+  };
+  modal.appendChild(button);
+  
+  // Add modal to overlay and show
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+}
+
 // Tab switching
 var stopwatchTab = document.getElementById('stopwatch-tab');
 var timerTab = document.getElementById('timer-tab');
@@ -191,6 +221,8 @@ stopwatchTab.addEventListener('click', function() {
   timerTab.classList.remove('active');
   stopwatchContainer.classList.add('active');
   timerContainer.classList.remove('active');
+  // Show reset button in stopwatch mode
+  resetBtn.style.display = 'inline-block';
 });
 
 timerTab.addEventListener('click', function() {
@@ -198,46 +230,17 @@ timerTab.addEventListener('click', function() {
   stopwatchTab.classList.remove('active');
   timerContainer.classList.add('active');
   stopwatchContainer.classList.remove('active');
+  // Hide reset button in timer mode
+  resetBtn.style.display = 'none';
 });
 
-// Stopwatch controls
+// Unified action buttons (work for both stopwatch and timer)
 var startBtn = document.getElementById('start-btn');
 var pauseBtn = document.getElementById('pause-btn');
 var stopBtn = document.getElementById('stop-btn');
 var resetBtn = document.getElementById('reset-btn');
 
-startBtn.addEventListener('click', function() {
-  stopwatch.start();
-  startBtn.disabled = true;
-  pauseBtn.disabled = false;
-  stopBtn.disabled = false;
-  resetBtn.disabled = false;
-});
-
-pauseBtn.addEventListener('click', function() {
-  stopwatch.pause();
-  startBtn.disabled = false;
-  pauseBtn.disabled = true;
-});
-
-stopBtn.addEventListener('click', function() {
-  stopwatch.stop();
-  startBtn.disabled = false;
-  pauseBtn.disabled = true;
-  stopBtn.disabled = true;
-});
-
-resetBtn.addEventListener('click', function() {
-  stopwatch.reset();
-  startBtn.disabled = false;
-  pauseBtn.disabled = true;
-  stopBtn.disabled = true;
-});
-
-// Timer controls
-var timerStartBtn = document.getElementById('timer-start-btn');
-var timerPauseBtn = document.getElementById('timer-pause-btn');
-var timerStopBtn = document.getElementById('timer-stop-btn');
+// Timer input fields
 var hoursInput = document.getElementById('hours-input');
 var minutesInput = document.getElementById('minutes-input');
 var secondsInput = document.getElementById('seconds-input');
@@ -286,33 +289,63 @@ function updateTimerDisplay() {
 
 setupInputValidation();
 
-timerStartBtn.addEventListener('click', function() {
-  var hours = parseInt(hoursInput.value) || 0;
-  var minutes = parseInt(minutesInput.value) || 0;
-  var seconds = parseInt(secondsInput.value) || 0;
-  
-  if (hours === 0 && minutes === 0 && seconds === 0) {
-    alert('Please set a time greater than 0');
-    return;
+// Unified action button handlers
+startBtn.addEventListener('click', function() {
+  if (stopwatchContainer.classList.contains('active')) {
+    // Stopwatch mode
+    stopwatch.start();
+  } else {
+    // Timer mode
+    var hours = parseInt(hoursInput.value) || 0;
+    var minutes = parseInt(minutesInput.value) || 0;
+    var seconds = parseInt(secondsInput.value) || 0;
+    
+    if (hours === 0 && minutes === 0 && seconds === 0) {
+      showModal('Please set a time greater than 0');
+      return;
+    }
+    
+    timer.setTime(hours, minutes, seconds);
+    timer.start();
   }
   
-  timer.setTime(hours, minutes, seconds);
-  timer.start();
-  timerStartBtn.disabled = true;
-  timerPauseBtn.disabled = false;
-  timerStopBtn.disabled = false;
-  timerResetBtn.disabled = false;
+  startBtn.disabled = true;
+  pauseBtn.disabled = false;
+  stopBtn.disabled = false;
+  resetBtn.disabled = false;
 });
 
-timerPauseBtn.addEventListener('click', function() {
-  timer.pause();
-  timerStartBtn.disabled = false;
-  timerPauseBtn.disabled = true;
+pauseBtn.addEventListener('click', function() {
+  if (stopwatchContainer.classList.contains('active')) {
+    stopwatch.pause();
+  } else {
+    timer.pause();
+  }
+  
+  startBtn.disabled = false;
+  pauseBtn.disabled = true;
 });
 
-timerStopBtn.addEventListener('click', function() {
-  timer.stop();
-  timerStartBtn.disabled = false;
-  timerPauseBtn.disabled = true;
-  timerStopBtn.disabled = true;
+stopBtn.addEventListener('click', function() {
+  if (stopwatchContainer.classList.contains('active')) {
+    stopwatch.stop();
+  } else {
+    timer.stop();
+  }
+  
+  startBtn.disabled = false;
+  pauseBtn.disabled = true;
+  stopBtn.disabled = true;
+});
+
+resetBtn.addEventListener('click', function() {
+  if (stopwatchContainer.classList.contains('active')) {
+    stopwatch.reset();
+  } else {
+    timer.reset();
+  }
+  
+  startBtn.disabled = false;
+  pauseBtn.disabled = true;
+  stopBtn.disabled = true;
 });

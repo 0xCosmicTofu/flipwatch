@@ -12,13 +12,30 @@ body {
   text-align: center;
 }
 
+/* Header Layout */
+#header {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 30px;
+  width: 100%;
+  position: relative;
+  /* background: purple; */ /* Debug: highlight header container */
+  padding-left: 0;
+  padding-right: 0;
+}
+
 /* Tab Navigation */
 #tab-navigation {
-  margin-bottom: 30px;
+  flex-shrink: 0;
+  border: 1px solid #000;
+  border-radius: 50px;
+  padding: 2px;
+  /* background: teal; */ /* Debug: highlight tab navigation container */
 }
 
 .tab-btn {
-  margin: 0 10px;
+  margin: 0;
   padding: 12px 24px;
   font-size: 16px;
   font-weight: bold;
@@ -43,6 +60,16 @@ body {
   background: #333333;
 }
 
+/* Action Buttons */
+#action-buttons {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+  position: absolute;
+  right: 0;
+  /* background: yellow; */ /* Debug: highlight action buttons container */
+}
+
 /* Mode Containers */
 .mode-container {
   display: none;
@@ -52,24 +79,94 @@ body {
   display: block;
 }
 
-/* Timer Input Styling */
+/* Ensure consistent height across modes */
+#app-container {
+  min-height: 600px; /* Account for header + flip display + timer inputs + spacing */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Force consistent height for mode containers */
+.mode-container {
+  min-height: 300px; /* Space for flip display + timer inputs */
+}
+
+/* Hide timer inputs by default and on stopwatch mode */
 #timer-input {
-  margin-bottom: 30px;
+  display: none;
+}
+
+/* Show timer inputs only in timer mode */
+#timer-container.active #timer-input {
+  display: flex;
+}
+
+/* Hide reset button in timer mode (controlled by JavaScript) */
+
+/* Custom Modal Styling */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
-  gap: 20px;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: #EEE;
+  border-radius: 15px;
+  padding: 30px;
+  text-align: center;
+  max-width: 400px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.modal h3 {
+  margin: 0 0 20px 0;
+  font-family: 'Helvetica', sans-serif;
+  font-weight: bold;
+  color: #333;
+}
+
+.modal button {
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  background: #000000;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.modal button:hover {
+  background: #333333;
+}
+
+/* Timer Input Styling */
+#timer-input {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 30px;
 }
 
 .input-group {
   display: flex;
-  flex-direction: column;
+  flex-direction: column-reverse;
   align-items: center;
 }
 
 .input-group label {
   font-size: 12px;
   font-weight: bold;
-  margin-bottom: 8px;
+  margin-top: 8px;
   color: #333;
   font-family: 'Helvetica', sans-serif;
   text-transform: uppercase;
@@ -108,12 +205,9 @@ body {
   -moz-appearance: textfield;
 }
 
-#controls, #timer-controls {
-  margin-top: 30px;
-}
-
-#controls button, #timer-controls button {
-  margin: 0 10px;
+/* Action Button Styling */
+#action-buttons button {
+  margin: 0 5px;
   padding: 12px 24px;
   font-size: 16px;
   font-weight: bold;
@@ -123,43 +217,43 @@ body {
   transition: all 0.3s ease;
 }
 
-#start-btn, #timer-start-btn {
+#start-btn {
   background: #000000;
   color: white;
 }
 
-#start-btn:hover:not(:disabled), #timer-start-btn:hover:not(:disabled) {
+#start-btn:hover:not(:disabled) {
   background: #333333;
 }
 
-#pause-btn, #timer-pause-btn {
+#pause-btn {
   background: #FF9800;
   color: white;
 }
 
-#pause-btn:hover:not(:disabled), #timer-pause-btn:hover:not(:disabled) {
+#pause-btn:hover:not(:disabled) {
   background: #e68900;
 }
 
-#stop-btn, #timer-stop-btn {
+#stop-btn {
   background: #f44336;
   color: white;
 }
 
-#stop-btn:hover:not(:disabled), #timer-stop-btn:hover:not(:disabled) {
+#stop-btn:hover:not(:disabled) {
   background: #da190b;
 }
 
-#reset-btn, #timer-reset-btn {
+#reset-btn {
   background: #2196F3;
   color: white;
 }
 
-#reset-btn:hover:not(:disabled), #timer-reset-btn:hover:not(:disabled) {
+#reset-btn:hover:not(:disabled) {
   background: #0b7dda;
 }
 
-#controls button:disabled, #timer-controls button:disabled {
+#action-buttons button:disabled {
   background: #cccccc;
   color: #666666;
   cursor: not-allowed;
@@ -173,6 +267,16 @@ body {
   *,
   *:before,
   *:after { box-sizing: border-box; }
+}
+
+/* Ensure flip displays are properly contained */
+#stopwatch-display,
+#timer-display {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px; /* Consistent height for flip displays */
+  /* background: cyan; */ /* Debug: highlight flip display containers */
 }
 
 .flip-clock__piece {
