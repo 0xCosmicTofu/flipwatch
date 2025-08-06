@@ -3,17 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flip Stopwatch</title>
+    <title>FlipWatch</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="stopwatch-container">
-        <div id="stopwatch-display"></div>
-        <div id="controls">
-            <button id="start-btn">Start</button>
-            <button id="pause-btn" disabled>Pause</button>
-            <button id="stop-btn" disabled>Stop</button>
-            <button id="reset-btn">Reset</button>
+    <div id="app-container">
+        <!-- Tab Navigation -->
+        <div id="tab-navigation">
+            <button id="stopwatch-tab" class="tab-btn active">Stopwatch</button>
+            <button id="timer-tab" class="tab-btn">Timer</button>
+        </div>
+
+        <!-- Stopwatch Mode -->
+        <div id="stopwatch-container" class="mode-container active">
+            <div id="stopwatch-display"></div>
+            <div id="controls">
+                <button id="start-btn">Start</button>
+                <button id="pause-btn" disabled>Pause</button>
+                <button id="stop-btn" disabled>Stop</button>
+                <button id="reset-btn">Reset</button>
+            </div>
+        </div>
+
+        <!-- Timer Mode -->
+        <div id="timer-container" class="mode-container">
+            <div id="timer-input">
+                <div class="input-group">
+                    <label for="hours-input">Hours:</label>
+                    <input type="number" id="hours-input" min="0" max="99" value="" placeholder="0">
+                </div>
+                <div class="input-group">
+                    <label for="minutes-input">Minutes:</label>
+                    <input type="number" id="minutes-input" min="0" max="59" value="" placeholder="0">
+                </div>
+                <div class="input-group">
+                    <label for="seconds-input">Seconds:</label>
+                    <input type="number" id="seconds-input" min="0" max="59" value="" placeholder="0">
+                </div>
+            </div>
+            <div id="timer-display"></div>
+            <div id="timer-controls">
+                <button id="timer-start-btn">Start</button>
+                <button id="timer-pause-btn" disabled>Pause</button>
+                <button id="timer-stop-btn" disabled>Stop</button>
+            </div>
         </div>
     </div>
     <script src="script.js"></script>

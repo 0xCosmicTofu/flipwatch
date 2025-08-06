@@ -97,11 +97,110 @@ function Stopwatch() {
   this.updateDisplay();
 }
 
-// Initialize stopwatch
-var stopwatch = new Stopwatch();
-document.getElementById('stopwatch-display').appendChild(stopwatch.el);
+function Timer() {
+  this.el = document.createElement('div');
+  this.el.className = 'flip-clock';
+  this.el.id = 'timer-display';
 
-// Button controls
+  this.trackers = {};
+  this.isRunning = false;
+  this.startTime = 0;
+  this.totalTime = 0;
+  this.remainingTime = 0;
+  this.interval = null;
+
+  // Create trackers for hours, minutes and seconds
+  this.trackers['Hours'] = new CountdownTracker(0);
+  this.trackers['Minutes'] = new CountdownTracker(0);
+  this.trackers['Seconds'] = new CountdownTracker(0);
+  
+  this.el.appendChild(this.trackers['Hours'].el);
+  this.el.appendChild(this.trackers['Minutes'].el);
+  this.el.appendChild(this.trackers['Seconds'].el);
+
+  this.updateDisplay = function() {
+    var hours = Math.floor(this.remainingTime / 3600000);
+    var minutes = Math.floor((this.remainingTime % 3600000) / 60000);
+    var seconds = Math.floor((this.remainingTime % 60000) / 1000);
+    
+    this.trackers['Hours'].update(hours);
+    this.trackers['Minutes'].update(minutes);
+    this.trackers['Seconds'].update(seconds);
+  };
+
+  this.setTime = function(hours, minutes, seconds) {
+    this.totalTime = (hours * 3600000) + (minutes * 60000) + (seconds * 1000);
+    this.remainingTime = this.totalTime;
+    this.updateDisplay();
+  };
+
+  this.start = function() {
+    if (!this.isRunning && this.remainingTime > 0) {
+      this.isRunning = true;
+      this.startTime = Date.now() - (this.totalTime - this.remainingTime);
+      this.interval = setInterval(() => {
+        this.remainingTime = this.totalTime - (Date.now() - this.startTime);
+        if (this.remainingTime <= 0) {
+          this.remainingTime = 0;
+          this.stop();
+          alert('Timer complete!');
+        }
+        this.updateDisplay();
+      }, 100);
+    }
+  };
+
+  this.pause = function() {
+    if (this.isRunning) {
+      this.isRunning = false;
+      clearInterval(this.interval);
+    }
+  };
+
+  this.stop = function() {
+    this.isRunning = false;
+    clearInterval(this.interval);
+    this.remainingTime = this.totalTime;
+    this.updateDisplay();
+  };
+
+  this.reset = function() {
+    this.stop();
+    this.remainingTime = this.totalTime;
+    this.updateDisplay();
+  };
+
+  this.updateDisplay();
+}
+
+// Initialize stopwatch and timer
+var stopwatch = new Stopwatch();
+var timer = new Timer();
+
+document.getElementById('stopwatch-display').appendChild(stopwatch.el);
+document.getElementById('timer-display').appendChild(timer.el);
+
+// Tab switching
+var stopwatchTab = document.getElementById('stopwatch-tab');
+var timerTab = document.getElementById('timer-tab');
+var stopwatchContainer = document.getElementById('stopwatch-container');
+var timerContainer = document.getElementById('timer-container');
+
+stopwatchTab.addEventListener('click', function() {
+  stopwatchTab.classList.add('active');
+  timerTab.classList.remove('active');
+  stopwatchContainer.classList.add('active');
+  timerContainer.classList.remove('active');
+});
+
+timerTab.addEventListener('click', function() {
+  timerTab.classList.add('active');
+  stopwatchTab.classList.remove('active');
+  timerContainer.classList.add('active');
+  stopwatchContainer.classList.remove('active');
+});
+
+// Stopwatch controls
 var startBtn = document.getElementById('start-btn');
 var pauseBtn = document.getElementById('pause-btn');
 var stopBtn = document.getElementById('stop-btn');
@@ -133,4 +232,87 @@ resetBtn.addEventListener('click', function() {
   startBtn.disabled = false;
   pauseBtn.disabled = true;
   stopBtn.disabled = true;
+});
+
+// Timer controls
+var timerStartBtn = document.getElementById('timer-start-btn');
+var timerPauseBtn = document.getElementById('timer-pause-btn');
+var timerStopBtn = document.getElementById('timer-stop-btn');
+var hoursInput = document.getElementById('hours-input');
+var minutesInput = document.getElementById('minutes-input');
+var secondsInput = document.getElementById('seconds-input');
+
+// Input validation and behavior
+function setupInputValidation() {
+  [hoursInput, minutesInput, secondsInput].forEach(input => {
+    input.addEventListener('input', function() {
+      var value = parseInt(this.value) || 0;
+      var max = parseInt(this.max);
+      
+      if (value > max) {
+        this.value = max;
+      }
+      
+      // Remove placeholder when user starts typing
+      if (this.value !== '') {
+        this.placeholder = '';
+      } else {
+        this.placeholder = '0';
+      }
+      
+      // Update flip display in real-time
+      updateTimerDisplay();
+    });
+    
+    input.addEventListener('blur', function() {
+      if (this.value === '') {
+        this.placeholder = '0';
+      }
+      // Update flip display when input loses focus
+      updateTimerDisplay();
+    });
+  });
+}
+
+// Function to update timer display based on input values
+function updateTimerDisplay() {
+  var hours = parseInt(hoursInput.value) || 0;
+  var minutes = parseInt(minutesInput.value) || 0;
+  var seconds = parseInt(secondsInput.value) || 0;
+  
+  // Update the timer display without starting the countdown
+  timer.setTime(hours, minutes, seconds);
+}
+
+setupInputValidation();
+
+timerStartBtn.addEventListener('click', function() {
+  var hours = parseInt(hoursInput.value) || 0;
+  var minutes = parseInt(minutesInput.value) || 0;
+  var seconds = parseInt(secondsInput.value) || 0;
+  
+  if (hours === 0 && minutes === 0 && seconds === 0) {
+    alert('Please set a time greater than 0');
+    return;
+  }
+  
+  timer.setTime(hours, minutes, seconds);
+  timer.start();
+  timerStartBtn.disabled = true;
+  timerPauseBtn.disabled = false;
+  timerStopBtn.disabled = false;
+  timerResetBtn.disabled = false;
+});
+
+timerPauseBtn.addEventListener('click', function() {
+  timer.pause();
+  timerStartBtn.disabled = false;
+  timerPauseBtn.disabled = true;
+});
+
+timerStopBtn.addEventListener('click', function() {
+  timer.stop();
+  timerStartBtn.disabled = false;
+  timerPauseBtn.disabled = true;
+  timerStopBtn.disabled = true;
 });
